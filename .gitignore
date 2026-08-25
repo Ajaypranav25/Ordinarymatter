@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.expo/
+*.log
+.env
+.env.local
+.DS_Store
+Thumbs.db
+
+# Server
+server/node_modules/
+server/dist/
+
+# Mobile
+mobile/node_modules/
+mobile/.expo/
+mobile/android/
+mobile/ios/
+mobile/web-build/
+
+# Tunnel
+*.tunnel.json

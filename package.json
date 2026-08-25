@@ -1,0 +1,15 @@
+{
+  "name": "ordinarymatter",
+  "version": "1.0.0",
+  "description": "Remote control and monitoring for Antigravity AI coding sessions",
+  "private": true,
+  "scripts": {
+    "server": "cd server && node src/index.js",
+    "tunnel": "cd server && node -e \"require('./src/tunnel.js').startTunnel()\"",
+    "mobile": "cd mobile && npx expo start",
+    "install-plugin": "node scripts/install-plugin.js",
+    "start": "npm run server"
+  },
+  "keywords": ["antigravity", "remote-control", "ai-coding", "mobile-companion"],
+  "license": "MIT"
+}

@@ -1,0 +1,49 @@
+{
+  "ordinarymatter-bridge": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "node \"%~dp0scripts/hook-bridge.js\" pre-invocation",
+        "timeout": 5
+      }
+    ],
+    "PostInvocation": [
+      {
+        "type": "command",
+        "command": "node \"%~dp0scripts/hook-bridge.js\" post-invocation",
+        "timeout": 5
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"%~dp0scripts/hook-bridge.js\" pre-tool-use",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"%~dp0scripts/hook-bridge.js\" post-tool-use",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node \"%~dp0scripts/hook-bridge.js\" stop",
+        "timeout": 5
+      }
+    ]
+  }
+}
