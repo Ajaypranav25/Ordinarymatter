@@ -122,8 +122,8 @@ class AuthManager {
   middleware() {
     return (req, res, next) => {
       // Allow pairing and status endpoints without auth
-      const openPaths = ['/api/pair', '/api/health'];
-      if (openPaths.some(p => req.path.startsWith(p))) {
+      const openPaths = ['/pair', '/health', '/api/pair', '/api/health'];
+      if (openPaths.some(p => req.path.startsWith(p) || req.originalUrl?.startsWith(p))) {
         return next();
       }
 
