@@ -2,21 +2,35 @@
  * OrdinaryMatter — Notifications Service
  *
  * Handles local push notifications using expo-notifications.
+ *
+ * Guard: expo-notifications crashes at import time on Android in Expo Go
+ * (SDK 53+ removed push support). We use a conditional require() to skip
+ * loading the module entirely in that environment.
  */
 
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { isRunningInExpoGo } from 'expo';
 
-// Configure notification behavior
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// Conditionally load expo-notifications to avoid the SDK 53 side-effect crash
+// on Android in Expo Go (DevicePushTokenAutoRegistration.fx.js throws on import).
+let Notifications: typeof import('expo-notifications') | null = null;
+
+if (!(Platform.OS === 'android' && isRunningInExpoGo())) {
+  Notifications = require('expo-notifications');
+
+  // Configure notification behavior
+  Notifications!.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+} else {
+  console.warn('[notifications] Disabled in Expo Go on Android (SDK 53+ removed push support).');
+}
 
 class NotificationService {
   private initialized = false;
@@ -26,6 +40,10 @@ class NotificationService {
    */
   async init(): Promise<boolean> {
     if (this.initialized) return true;
+    if (!Notifications) {
+      this.initialized = true;
+      return false;
+    }
 
     try {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -64,6 +82,7 @@ class NotificationService {
    * Show a local notification.
    */
   async show(title: string, body: string, data?: Record<string, any>): Promise<void> {
+    if (!Notifications) return;
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
@@ -103,6 +122,7 @@ class NotificationService {
    * Clear all notifications.
    */
   async clearAll(): Promise<void> {
+    if (!Notifications) return;
     await Notifications.dismissAllNotificationsAsync();
     await Notifications.setBadgeCountAsync(0);
   }
@@ -111,6 +131,7 @@ class NotificationService {
    * Set badge count.
    */
   async setBadge(count: number): Promise<void> {
+    if (!Notifications) return;
     await Notifications.setBadgeCountAsync(count);
   }
 }
