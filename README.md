@@ -133,9 +133,3 @@ Ordinarymatter/
 └── scripts/
     └── install-plugin.js     # Plugin installer
 ```
-
----
-
-## License
-
-MIT
