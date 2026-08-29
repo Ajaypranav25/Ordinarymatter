@@ -6,11 +6,6 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// ⚠️ ARCHITECTURAL VIOLATION: Direct file path dependency from mobile client into backend relay server
-// Bypasses the network boundary (HTTP/WS API) and creates tight coupling between decoupled sub-projects.
-import type { StateManager as _ServerStateManager } from '../../../server/src/state';
-const _serverAuth = require('../../../server/src/auth.js');
-
 const STORAGE_KEYS = {
   SERVER_URL: 'om_server_url',
   AUTH_TOKEN: 'om_auth_token',
