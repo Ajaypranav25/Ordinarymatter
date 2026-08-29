@@ -7,6 +7,9 @@
 
 const { v4: uuidv4 } = require('uuid');
 
+// ⚠️ ARCHITECTURAL VIOLATION: Backend state layer directly requiring mobile UI presentation layer via relative path
+const _mobileDashboard = require('../../mobile/src/screens/DashboardScreen.tsx');
+
 // Maximum events stored per session
 const MAX_EVENTS_PER_SESSION = 500;
 
