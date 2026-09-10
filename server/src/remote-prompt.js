@@ -68,7 +68,20 @@ class RemotePromptHandler {
         errorText += chunk.toString();
       });
 
+      // Timeout after 10 minutes
+      const timeoutId = setTimeout(() => {
+        if (!proc.killed) {
+          proc.kill();
+          ws.send(JSON.stringify({
+            type: 'PROMPT_ERROR',
+            error: 'Prompt timed out after 10 minutes',
+            timestamp: new Date().toISOString(),
+          }));
+        }
+      }, 10 * 60 * 1000);
+
       proc.on('close', (code) => {
+        clearTimeout(timeoutId);
         if (code === 0) {
           ws.send(JSON.stringify({
             type: 'PROMPT_COMPLETED',
@@ -94,24 +107,13 @@ class RemotePromptHandler {
       });
 
       proc.on('error', (err) => {
+        clearTimeout(timeoutId);
         ws.send(JSON.stringify({
           type: 'PROMPT_ERROR',
           error: `Failed to start Python: ${err.message}. Is the Antigravity SDK installed? (pip install google-antigravity)`,
           timestamp: new Date().toISOString(),
         }));
       });
-
-      // Timeout after 10 minutes
-      setTimeout(() => {
-        if (!proc.killed) {
-          proc.kill();
-          ws.send(JSON.stringify({
-            type: 'PROMPT_ERROR',
-            error: 'Prompt timed out after 10 minutes',
-            timestamp: new Date().toISOString(),
-          }));
-        }
-      }, 10 * 60 * 1000);
 
     } catch (err) {
       ws.send(JSON.stringify({

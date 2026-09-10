@@ -53,6 +53,14 @@ class TunnelManager {
 
       let started = false;
 
+      // Timeout after 30 seconds
+      const timeoutId = setTimeout(() => {
+        if (!started) {
+          console.log('[tunnel] Timeout waiting for tunnel URL');
+          resolve(null);
+        }
+      }, 30000);
+
       // cloudflared outputs the URL on stderr
       this.process.stderr.on('data', (data) => {
         const output = data.toString();
@@ -61,6 +69,7 @@ class TunnelManager {
         const urlMatch = output.match(/https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com/);
         if (urlMatch && !started) {
           started = true;
+          clearTimeout(timeoutId);
           this.publicUrl = urlMatch[0];
           console.log(`\n🌐 Tunnel URL: ${this.publicUrl}`);
           console.log(`   Use this URL in the OrdinaryMatter mobile app to connect.\n`);
@@ -70,22 +79,20 @@ class TunnelManager {
 
       this.process.on('error', (err) => {
         console.error(`[tunnel] Error: ${err.message}`);
-        if (!started) resolve(null);
+        if (!started) {
+          clearTimeout(timeoutId);
+          resolve(null);
+        }
       });
 
       this.process.on('close', (code) => {
         console.log(`[tunnel] Cloudflare Tunnel exited with code ${code}`);
         this.publicUrl = null;
-        if (!started) resolve(null);
-      });
-
-      // Timeout after 30 seconds
-      setTimeout(() => {
         if (!started) {
-          console.log('[tunnel] Timeout waiting for tunnel URL');
+          clearTimeout(timeoutId);
           resolve(null);
         }
-      }, 30000);
+      });
     });
   }
 

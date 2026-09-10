@@ -37,6 +37,11 @@ export class WebSocketService {
       this.ws = null;
     }
 
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
     // Convert HTTP URL to WebSocket URL
     const wsUrl = this.serverUrl
       .replace(/^http:/, 'ws:')
