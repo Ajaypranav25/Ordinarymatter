@@ -5,7 +5,7 @@
  * Antigravity via the Python SDK.
  */
 
-const { spawn } = require('child_process');
+const child_process = require('child_process');
 const path = require('path');
 
 class RemotePromptHandler {
@@ -43,7 +43,7 @@ class RemotePromptHandler {
       // The SDK script spawns an agent and sends the prompt
       const pythonScript = this.buildPythonScript(prompt, workspacePath);
 
-      const proc = spawn('python', ['-c', pythonScript], {
+      const proc = child_process.spawn('python', ['-c', pythonScript], {
         cwd: workspacePath || process.cwd(),
         env: { ...process.env },
         stdio: ['pipe', 'pipe', 'pipe'],
@@ -68,7 +68,19 @@ class RemotePromptHandler {
         errorText += chunk.toString();
       });
 
+      const timeoutId = setTimeout(() => {
+        if (!proc.killed) {
+          proc.kill();
+          ws.send(JSON.stringify({
+            type: 'PROMPT_ERROR',
+            error: 'Prompt timed out after 10 minutes',
+            timestamp: new Date().toISOString(),
+          }));
+        }
+      }, 10 * 60 * 1000);
+
       proc.on('close', (code) => {
+        clearTimeout(timeoutId);
         if (code === 0) {
           ws.send(JSON.stringify({
             type: 'PROMPT_COMPLETED',
@@ -100,18 +112,6 @@ class RemotePromptHandler {
           timestamp: new Date().toISOString(),
         }));
       });
-
-      // Timeout after 10 minutes
-      setTimeout(() => {
-        if (!proc.killed) {
-          proc.kill();
-          ws.send(JSON.stringify({
-            type: 'PROMPT_ERROR',
-            error: 'Prompt timed out after 10 minutes',
-            timestamp: new Date().toISOString(),
-          }));
-        }
-      }, 10 * 60 * 1000);
 
     } catch (err) {
       ws.send(JSON.stringify({
