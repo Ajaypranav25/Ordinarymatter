@@ -26,14 +26,14 @@ export interface Session {
   toolCallCount: number;
   errorCount: number;
   eventCount: number;
-  events?: any[];
+  events?: Record<string, unknown>[];
 }
 
 export interface Notification {
   id: string;
   type: string;
   message: string;
-  data: any;
+  data: Record<string, unknown> | null;
   timestamp: string;
   read: boolean;
 }
@@ -67,7 +67,11 @@ export interface AppStateType {
   promptError: string | null;
 
   // Device
-  pairedDevice: any;
+  pairedDevice: {
+    id: string;
+    name: string;
+    platform: string;
+  } | null;
 }
 
 const initialState: AppStateType = {
@@ -90,7 +94,7 @@ const initialState: AppStateType = {
 type Action =
   | { type: 'SET_CONNECTED'; payload: boolean }
   | { type: 'SET_PAIRED'; payload: boolean }
-  | { type: 'SET_SERVER_STATUS'; payload: any }
+  | { type: 'SET_SERVER_STATUS'; payload: unknown }
   | { type: 'SET_SESSIONS'; payload: Session[] }
   | { type: 'UPDATE_SESSION'; payload: Session }
   | { type: 'SET_CURRENT_SESSION'; payload: Session | null }
@@ -102,7 +106,7 @@ type Action =
   | { type: 'PROMPT_COMPLETED'; payload: string }
   | { type: 'PROMPT_ERROR'; payload: string }
   | { type: 'PROMPT_RESET' }
-  | { type: 'SET_DEVICE'; payload: any }
+  | { type: 'SET_DEVICE'; payload: NonNullable<AppStateType['pairedDevice']> }
   | { type: 'RESET' };
 
 function reducer(state: AppStateType, action: Action): AppStateType {
@@ -114,7 +118,7 @@ function reducer(state: AppStateType, action: Action): AppStateType {
       return { ...state, isPaired: action.payload };
 
     case 'SET_SERVER_STATUS':
-      return { ...state, serverStatus: action.payload };
+      return { ...state, serverStatus: action.payload as AppStateType['serverStatus'] };
 
     case 'SET_SESSIONS':
       return { ...state, sessions: action.payload };

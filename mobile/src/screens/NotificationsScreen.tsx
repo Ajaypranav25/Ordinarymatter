@@ -63,7 +63,7 @@ export function NotificationsScreen({ navigation }: any) {
           wsService.markRead([item.id]);
 
           // Navigate to session if applicable
-          if (item.data?.sessionId) {
+          if (item.data && typeof item.data.sessionId === 'string') {
             navigation.navigate('Sessions', {
               screen: 'SessionDetail',
               params: { sessionId: item.data.sessionId },
