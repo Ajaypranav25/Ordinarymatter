@@ -5,7 +5,7 @@
  * Handles auto-reconnection, auth, and message dispatching.
  */
 
-type MessageHandler = (message: any) => void;
+type MessageHandler = (message: unknown) => void;
 type ConnectionHandler = (connected: boolean) => void;
 
 export class WebSocketService {

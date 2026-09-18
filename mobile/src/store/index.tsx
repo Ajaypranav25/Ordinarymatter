@@ -211,7 +211,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // ─── WebSocket message handler ────────────────────────
 
   useEffect(() => {
-    const unsubMessage = wsService.onMessage((message) => {
+    const unsubMessage = wsService.onMessage((rawMessage) => {
+      const message = rawMessage as any;
       switch (message.type) {
         case 'INITIAL_STATE':
           dispatch({ type: 'SET_SERVER_STATUS', payload: message.status });
