@@ -5,7 +5,7 @@
  * their status, events, and conversation history.
  */
 
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 // Maximum events stored per session
 const MAX_EVENTS_PER_SESSION = 500;
@@ -141,7 +141,7 @@ class StateManager {
 
     // Add event to session timeline
     const timelineEvent = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       type: event.eventType,
       timestamp: event.timestamp || now,
       toolName: event.toolName || null,
@@ -176,7 +176,7 @@ class StateManager {
     const now = new Date().toISOString();
 
     const transcriptEvent = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       type: 'transcript',
       timestamp: now,
       source: entry.source || null,
@@ -214,7 +214,7 @@ class StateManager {
    */
   addNotification(notifType, message, data = {}) {
     const notification = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       type: notifType,
       message,
       data,
