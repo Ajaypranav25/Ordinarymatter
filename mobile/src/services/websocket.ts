@@ -5,7 +5,7 @@
  * Handles auto-reconnection, auth, and message dispatching.
  */
 
-type MessageHandler = (message: any) => void;
+type MessageHandler = (message: unknown) => void;
 type ConnectionHandler = (connected: boolean) => void;
 
 export class WebSocketService {
@@ -127,7 +127,7 @@ export class WebSocketService {
   /**
    * Send a message to the server.
    */
-  send(message: any): void {
+  send(message: unknown): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
     }

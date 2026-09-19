@@ -211,7 +211,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // ─── WebSocket message handler ────────────────────────
 
   useEffect(() => {
-    const unsubMessage = wsService.onMessage((message) => {
+    const unsubMessage = wsService.onMessage((message: any) => {
       switch (message.type) {
         case 'INITIAL_STATE':
           dispatch({ type: 'SET_SERVER_STATUS', payload: message.status });
@@ -291,7 +291,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const refreshSessions = useCallback(async () => {
     try {
-      const sessions = await apiService.getSessions();
+      const sessions = await apiService.getSessions() as Session[];
       dispatch({ type: 'SET_SESSIONS', payload: sessions });
     } catch {
       // Ignore errors

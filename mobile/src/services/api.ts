@@ -64,7 +64,7 @@ class ApiService {
   private async request<T>(
     method: string,
     path: string,
-    body?: any,
+    body?: unknown,
     requiresAuth: boolean = true
   ): Promise<T> {
     const url = `${this.baseUrl}${path}`;
@@ -103,10 +103,10 @@ class ApiService {
     code: string,
     deviceName: string,
     platform: string
-  ): Promise<{ token: string; device: any }> {
+  ): Promise<{ token: string; device: unknown }> {
     this.baseUrl = serverUrl;
 
-    const result = await this.request<{ token: string; device: any }>(
+    const result = await this.request<{ token: string; device: unknown }>(
       'POST',
       '/api/pair',
       { code, deviceName, platform },
@@ -131,23 +131,23 @@ class ApiService {
 
   // ─── Status ─────────────────────────────────────────────
 
-  async getStatus(): Promise<any> {
+  async getStatus(): Promise<unknown> {
     return this.request('GET', '/api/status');
   }
 
   // ─── Sessions ───────────────────────────────────────────
 
-  async getSessions(): Promise<any[]> {
+  async getSessions(): Promise<unknown[]> {
     return this.request('GET', '/api/sessions');
   }
 
-  async getSession(id: string): Promise<any> {
+  async getSession(id: string): Promise<unknown> {
     return this.request('GET', `/api/sessions/${encodeURIComponent(id)}`);
   }
 
   // ─── Notifications ─────────────────────────────────────
 
-  async getNotifications(): Promise<any[]> {
+  async getNotifications(): Promise<unknown[]> {
     return this.request('GET', '/api/notifications');
   }
 
@@ -157,7 +157,7 @@ class ApiService {
 
   // ─── Device ─────────────────────────────────────────────
 
-  async getDevice(): Promise<any> {
+  async getDevice(): Promise<unknown> {
     return this.request('GET', '/api/device');
   }
 
