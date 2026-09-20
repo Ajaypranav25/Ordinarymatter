@@ -14,7 +14,7 @@ interface EventCardProps {
     type: string;
     timestamp: string;
     toolName?: string | null;
-    toolArgs?: any;
+    toolArgs?: unknown;
     error?: string | null;
     content?: string | null;
     source?: string | null;
@@ -67,7 +67,7 @@ export function EventCard({ event }: EventCardProps) {
         </View>
       )}
 
-      {event.toolArgs && (
+      {event.toolArgs ? (
         <View style={styles.detail}>
           <Text style={styles.detailLabel}>Args</Text>
           <Text style={styles.detailMono} numberOfLines={3}>
@@ -76,7 +76,7 @@ export function EventCard({ event }: EventCardProps) {
               : JSON.stringify(event.toolArgs, null, 2)}
           </Text>
         </View>
-      )}
+      ) : null}
 
       {event.content && (
         <Text style={styles.content} numberOfLines={4}>

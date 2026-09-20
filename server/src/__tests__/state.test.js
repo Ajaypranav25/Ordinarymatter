@@ -36,4 +36,20 @@ test('state module tests', async (t) => {
     assert.strictEqual(state.notifications[0].message, 'message 149');
     assert.strictEqual(state.notifications[99].message, 'message 50');
   });
+
+  await t.test('processHookEvent handles stop event without error', () => {
+    const state = new StateManager();
+    state.processHookEvent({ conversationId: 'test-id', eventType: 'stop' });
+    const session = state.getOrCreateSession('test-id');
+    assert.strictEqual(session.status, SessionStatus.COMPLETED);
+    assert.strictEqual(session.currentTask, null);
+  });
+
+  await t.test('processHookEvent handles stop event with error', () => {
+    const state = new StateManager();
+    state.processHookEvent({ conversationId: 'test-id', eventType: 'stop', error: 'some error' });
+    const session = state.getOrCreateSession('test-id');
+    assert.strictEqual(session.status, SessionStatus.ERROR);
+    assert.strictEqual(session.currentTask, null);
+  });
 });

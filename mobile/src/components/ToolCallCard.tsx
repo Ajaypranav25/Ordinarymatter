@@ -10,7 +10,7 @@ import { colors, spacing, borderRadius, typography } from '../theme';
 
 interface ToolCallCardProps {
   name: string;
-  args?: any;
+  args?: unknown;
   error?: string | null;
 }
 

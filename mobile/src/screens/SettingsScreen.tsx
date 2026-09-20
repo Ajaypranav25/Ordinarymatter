@@ -66,8 +66,8 @@ export function SettingsScreen() {
       // Clear inputs
       setServerUrl('');
       setPairingCode('');
-    } catch (err: any) {
-      setPairError(err.message || 'Failed to pair. Check the URL and code.');
+    } catch (err: unknown) {
+      setPairError(err instanceof Error ? err.message : 'Failed to pair. Check the URL and code.');
     }
 
     setIsPairing(false);
