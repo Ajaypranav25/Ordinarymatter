@@ -6,6 +6,64 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export interface Device {
+  name: string;
+  platform: string;
+}
+
+export interface Session {
+  id: string;
+  status: string;
+  project: string | null;
+  workspacePaths: string[];
+  modelName: string | null;
+  currentTask: string | null;
+  createdAt: string;
+  updatedAt: string;
+  invocationCount: number;
+  toolCallCount: number;
+  errorCount: number;
+  eventCount: number;
+}
+
+export interface TimelineEvent {
+  id: string;
+  type: string;
+  timestamp: string;
+  toolName?: string | null;
+  toolArgs?: unknown | null;
+  error?: unknown | null;
+  invocationNum?: number | null;
+  terminationReason?: string | null;
+  source?: string | null;
+  stepType?: string | null;
+  content?: string | null;
+  toolCalls?: unknown | null;
+}
+
+export interface SessionDetail extends Session {
+  events: TimelineEvent[];
+}
+
+export interface Notification {
+  id: string;
+  type: string;
+  message: string;
+  data: Record<string, unknown>;
+  timestamp: string;
+  read: boolean;
+}
+
+export interface ServerStatus {
+  serverStartedAt: string;
+  totalSessions: number;
+  activeSessions: number;
+  currentSession: Session | null;
+  connectedClients: number;
+  paired: boolean;
+  unreadNotifications: number;
+}
+
 const STORAGE_KEYS = {
   SERVER_URL: 'om_server_url',
   AUTH_TOKEN: 'om_auth_token',
@@ -64,7 +122,7 @@ class ApiService {
   private async request<T>(
     method: string,
     path: string,
-    body?: any,
+    body?: unknown,
     requiresAuth: boolean = true
   ): Promise<T> {
     const url = `${this.baseUrl}${path}`;
@@ -103,10 +161,10 @@ class ApiService {
     code: string,
     deviceName: string,
     platform: string
-  ): Promise<{ token: string; device: any }> {
+  ): Promise<{ token: string; device: Device }> {
     this.baseUrl = serverUrl;
 
-    const result = await this.request<{ token: string; device: any }>(
+    const result = await this.request<{ token: string; device: Device }>(
       'POST',
       '/api/pair',
       { code, deviceName, platform },
@@ -131,24 +189,24 @@ class ApiService {
 
   // ─── Status ─────────────────────────────────────────────
 
-  async getStatus(): Promise<any> {
-    return this.request('GET', '/api/status');
+  async getStatus(): Promise<ServerStatus> {
+    return this.request<ServerStatus>('GET', '/api/status');
   }
 
   // ─── Sessions ───────────────────────────────────────────
 
-  async getSessions(): Promise<any[]> {
-    return this.request('GET', '/api/sessions');
+  async getSessions(): Promise<Session[]> {
+    return this.request<Session[]>('GET', '/api/sessions');
   }
 
-  async getSession(id: string): Promise<any> {
-    return this.request('GET', `/api/sessions/${encodeURIComponent(id)}`);
+  async getSession(id: string): Promise<SessionDetail> {
+    return this.request<SessionDetail>('GET', `/api/sessions/${encodeURIComponent(id)}`);
   }
 
   // ─── Notifications ─────────────────────────────────────
 
-  async getNotifications(): Promise<any[]> {
-    return this.request('GET', '/api/notifications');
+  async getNotifications(): Promise<Notification[]> {
+    return this.request<Notification[]>('GET', '/api/notifications');
   }
 
   async markNotificationsRead(ids: string[] = []): Promise<void> {
@@ -157,8 +215,8 @@ class ApiService {
 
   // ─── Device ─────────────────────────────────────────────
 
-  async getDevice(): Promise<any> {
-    return this.request('GET', '/api/device');
+  async getDevice(): Promise<Device> {
+    return this.request<Device>('GET', '/api/device');
   }
 
   // ─── Getters ────────────────────────────────────────────
