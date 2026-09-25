@@ -26,14 +26,14 @@ export interface Session {
   toolCallCount: number;
   errorCount: number;
   eventCount: number;
-  events?: any[];
+  events?: unknown[];
 }
 
 export interface Notification {
   id: string;
   type: string;
   message: string;
-  data: any;
+  data: unknown;
   timestamp: string;
   read: boolean;
 }
@@ -67,7 +67,7 @@ export interface AppStateType {
   promptError: string | null;
 
   // Device
-  pairedDevice: any;
+  pairedDevice: unknown;
 }
 
 const initialState: AppStateType = {
@@ -90,7 +90,7 @@ const initialState: AppStateType = {
 type Action =
   | { type: 'SET_CONNECTED'; payload: boolean }
   | { type: 'SET_PAIRED'; payload: boolean }
-  | { type: 'SET_SERVER_STATUS'; payload: any }
+  | { type: 'SET_SERVER_STATUS'; payload: NonNullable<AppStateType['serverStatus']> }
   | { type: 'SET_SESSIONS'; payload: Session[] }
   | { type: 'UPDATE_SESSION'; payload: Session }
   | { type: 'SET_CURRENT_SESSION'; payload: Session | null }
@@ -102,7 +102,7 @@ type Action =
   | { type: 'PROMPT_COMPLETED'; payload: string }
   | { type: 'PROMPT_ERROR'; payload: string }
   | { type: 'PROMPT_RESET' }
-  | { type: 'SET_DEVICE'; payload: any }
+  | { type: 'SET_DEVICE'; payload: unknown }
   | { type: 'RESET' };
 
 function reducer(state: AppStateType, action: Action): AppStateType {

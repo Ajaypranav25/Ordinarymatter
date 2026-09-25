@@ -52,4 +52,12 @@ test('state module tests', async (t) => {
     assert.strictEqual(session.status, SessionStatus.ERROR);
     assert.strictEqual(session.currentTask, null);
   });
+
+  await t.test('processHookEvent handles missing hookPayload in post-tool-use', () => {
+    const state = new StateManager();
+    state.processHookEvent({ conversationId: 'test-id', eventType: 'post-tool-use' });
+    const session = state.getOrCreateSession('test-id');
+    assert.strictEqual(session.status, SessionStatus.WORKING);
+    assert.strictEqual(session.toolCallCount, 1);
+  });
 });

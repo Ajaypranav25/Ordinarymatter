@@ -63,10 +63,11 @@ export function NotificationsScreen({ navigation }: any) {
           wsService.markRead([item.id]);
 
           // Navigate to session if applicable
-          if (item.data?.sessionId) {
+          const data = item.data as { sessionId?: string } | undefined;
+          if (data?.sessionId) {
             navigation.navigate('Sessions', {
               screen: 'SessionDetail',
-              params: { sessionId: item.data.sessionId },
+              params: { sessionId: data.sessionId },
             });
           }
         }}

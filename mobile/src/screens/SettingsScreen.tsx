@@ -161,7 +161,7 @@ export function SettingsScreen() {
                 </View>
                 <View style={styles.deviceDetails}>
                   <Text style={styles.deviceName}>
-                    {state.pairedDevice?.name || 'Your PC'}
+                    {(state.pairedDevice as { name?: string })?.name || 'Your PC'}
                   </Text>
                   <View style={styles.deviceStatus}>
                     <View
