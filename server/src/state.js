@@ -39,6 +39,8 @@ class StateManager {
 
   /**
    * Get or create a session by conversation ID.
+   * @param {string} [conversationId] - The ID of the conversation. If falsy, a new ID is generated.
+   * @returns {Object} The session object corresponding to the conversation ID.
    */
   getOrCreateSession(conversationId) {
     if (!conversationId) {
@@ -67,6 +69,18 @@ class StateManager {
 
   /**
    * Process a hook event and update session state.
+   * @param {Object} event - The hook event object to process.
+   * @param {string} event.conversationId - The associated conversation ID.
+   * @param {string} event.eventType - The type of event (e.g., 'pre-invocation', 'post-tool-use', 'stop').
+   * @param {string[]} [event.workspacePaths] - Workspace paths for the session.
+   * @param {string} [event.modelName] - The model used for the session.
+   * @param {number} [event.invocationNum] - The invocation number.
+   * @param {string} [event.toolName] - The name of the tool being used.
+   * @param {Object} [event.toolArgs] - Arguments passed to the tool.
+   * @param {Object} [event.hookPayload] - The payload containing potential errors or tool data.
+   * @param {string} [event.error] - An error message if the task failed.
+   * @param {string} [event.terminationReason] - Reason for session termination.
+   * @returns {Object} The updated session object.
    */
   processHookEvent(event) {
     const session = this.getOrCreateSession(event.conversationId);
@@ -170,6 +184,12 @@ class StateManager {
 
   /**
    * Add a transcript entry to a session (from transcript watcher).
+   * @param {string} conversationId - The ID of the conversation.
+   * @param {Object} entry - The transcript entry.
+   * @param {string} [entry.source] - The source of the transcript entry.
+   * @param {string} [entry.type] - The type of step (e.g., 'ASK_QUESTION', 'ASK_PERMISSION').
+   * @param {string} [entry.content] - The content of the entry.
+   * @param {Object} [entry.tool_calls] - Tool calls associated with the entry.
    */
   addTranscriptEntry(conversationId, entry) {
     const session = this.getOrCreateSession(conversationId);
@@ -211,6 +231,10 @@ class StateManager {
 
   /**
    * Add a notification.
+   * @param {string} notifType - The type of notification.
+   * @param {string} message - The notification message.
+   * @param {Object} [data={}] - Additional data associated with the notification.
+   * @returns {Object} The created notification object.
    */
   addNotification(notifType, message, data = {}) {
     const notification = {
@@ -239,6 +263,8 @@ class StateManager {
 
   /**
    * Serialize a session for API/WebSocket responses.
+   * @param {Object} session - The session object to serialize.
+   * @returns {Object} The serialized session object (excluding event history).
    */
   serializeSession(session) {
     return {
@@ -259,6 +285,7 @@ class StateManager {
 
   /**
    * Get all sessions (serialized, no events).
+   * @returns {Object[]} An array of serialized session objects sorted by most recently updated.
    */
   getAllSessions() {
     return Array.from(this.sessions.values())
@@ -268,6 +295,8 @@ class StateManager {
 
   /**
    * Get a session with its full event timeline.
+   * @param {string} conversationId - The ID of the conversation to detail.
+   * @returns {Object|null} The session details including events, or null if not found.
    */
   getSessionDetail(conversationId) {
     const session = this.sessions.get(conversationId);
@@ -281,6 +310,7 @@ class StateManager {
 
   /**
    * Get server status overview.
+   * @returns {Object} Status overview containing active session count, paired status, etc.
    */
   getStatus() {
     const sessions = this.getAllSessions();
@@ -301,17 +331,23 @@ class StateManager {
 
   /**
    * Register a WebSocket client.
+   * @param {WebSocket} ws - The WebSocket client to register.
    */
   addClient(ws) {
     this.wsClients.add(ws);
   }
 
+  /**
+   * Unregister a WebSocket client.
+   * @param {WebSocket} ws - The WebSocket client to remove.
+   */
   removeClient(ws) {
     this.wsClients.delete(ws);
   }
 
   /**
    * Broadcast a message to all connected WebSocket clients.
+   * @param {Object} message - The message object to broadcast.
    */
   broadcast(message) {
     const data = JSON.stringify(message);
@@ -328,6 +364,7 @@ class StateManager {
 
   /**
    * Mark notifications as read.
+   * @param {string[]} [ids=[]] - Optional array of notification IDs to mark as read. If empty, all are marked as read.
    */
   markNotificationsRead(ids = []) {
     if (ids.length === 0) {
