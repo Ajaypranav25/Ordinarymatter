@@ -19,7 +19,11 @@ import { StatusBadge } from '../components/StatusBadge';
 import { ConnectionBar } from '../components/ConnectionBar';
 import { colors, spacing, borderRadius, typography, cardStyle } from '../theme';
 
-export function DashboardScreen({ navigation }: any) {
+interface NavigationProp {
+  navigate: (screen: string, params?: unknown) => void;
+}
+
+export function DashboardScreen({ navigation }: { navigation: NavigationProp }) {
   const { state, refreshSessions } = useStore();
   const [refreshing, setRefreshing] = React.useState(false);
 

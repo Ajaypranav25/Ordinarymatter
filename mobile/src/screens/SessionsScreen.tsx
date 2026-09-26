@@ -23,7 +23,11 @@ import { colors, spacing, borderRadius, typography, cardStyle } from '../theme';
 
 // ─── Session List ────────────────────────────────────────────────
 
-export function SessionsListScreen({ navigation }: any) {
+interface NavigationProp {
+  navigate: (screen: string, params?: unknown) => void;
+}
+
+export function SessionsListScreen({ navigation }: { navigation: NavigationProp }) {
   const { state, refreshSessions } = useStore();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -106,10 +110,19 @@ export function SessionsListScreen({ navigation }: any) {
 
 // ─── Session Detail ──────────────────────────────────────────────
 
-export function SessionDetailScreen({ route }: any) {
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+type SessionsStackParamList = {
+  SessionsList: undefined;
+  SessionDetail: { sessionId: string };
+};
+
+type SessionDetailScreenProps = NativeStackScreenProps<SessionsStackParamList, 'SessionDetail'>;
+
+export function SessionDetailScreen({ route }: SessionDetailScreenProps) {
   const { sessionId } = route.params;
   const { state } = useStore();
-  const [detail, setDetail] = useState<any>(null);
+  const [detail, setDetail] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -193,8 +206,8 @@ export function SessionDetailScreen({ route }: any) {
         {/* Event Timeline */}
         <Text style={styles.timelineTitle}>Timeline</Text>
         {detail.events && detail.events.length > 0 ? (
-          detail.events.slice().reverse().map((event: any) => (
-            <EventCard key={event.id} event={event} />
+          detail.events.slice().reverse().map((event, index) => (
+            <EventCard key={event.id || index.toString()} event={event} />
           ))
         ) : (
           <Text style={styles.emptyText}>No events recorded yet.</Text>

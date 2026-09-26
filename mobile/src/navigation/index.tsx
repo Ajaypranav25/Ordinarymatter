@@ -8,7 +8,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { DashboardScreen } from '../screens/DashboardScreen';
 import { SessionsListScreen, SessionDetailScreen } from '../screens/SessionsScreen';
@@ -19,7 +19,12 @@ import { useStore } from '../store';
 import { colors, typography, spacing } from '../theme';
 
 const Tab = createBottomTabNavigator();
-const SessionsStack = createNativeStackNavigator();
+type SessionsStackParamList = {
+  SessionsList: undefined;
+  SessionDetail: { sessionId: string };
+};
+
+const SessionsStack = createNativeStackNavigator<SessionsStackParamList>();
 
 // ─── Tab Icons ──────────────────────────────────────────────────
 

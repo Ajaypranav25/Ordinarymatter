@@ -81,7 +81,7 @@ class NotificationService {
   /**
    * Show a local notification.
    */
-  async show(title: string, body: string, data?: Record<string, any>): Promise<void> {
+  async show(title: string, body: string, data?: Record<string, unknown>): Promise<void> {
     if (!Notifications) return;
     try {
       await Notifications.scheduleNotificationAsync({
@@ -104,7 +104,7 @@ class NotificationService {
   async showForEvent(notification: {
     type: string;
     message: string;
-    data?: any;
+    data?: unknown;
   }): Promise<void> {
     const titles: Record<string, string> = {
       task_completed: '✅ Task Completed',
@@ -115,7 +115,7 @@ class NotificationService {
     };
 
     const title = titles[notification.type] || '⚛️ OrdinaryMatter';
-    await this.show(title, notification.message, notification.data);
+    await this.show(title, notification.message, notification.data as Record<string, unknown> | undefined);
   }
 
   /**

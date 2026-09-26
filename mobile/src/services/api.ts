@@ -32,7 +32,7 @@ export interface TimelineEvent {
   timestamp: string;
   toolName?: string | null;
   toolArgs?: unknown | null;
-  error?: unknown | null;
+  error?: string | null;
   invocationNum?: number | null;
   terminationReason?: string | null;
   source?: string | null;
