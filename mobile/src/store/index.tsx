@@ -13,6 +13,18 @@ import { notificationService } from '../services/notifications';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
+export interface SessionEvent {
+  id: string;
+  type: string;
+  timestamp: string;
+  toolName?: string | null;
+  toolArgs?: unknown;
+  error?: string | null;
+  content?: string | null;
+  source?: string | null;
+  stepType?: string | null;
+}
+
 export interface Session {
   id: string;
   status: string;
@@ -26,7 +38,7 @@ export interface Session {
   toolCallCount: number;
   errorCount: number;
   eventCount: number;
-  events?: unknown[];
+  events?: SessionEvent[];
 }
 
 export interface Notification {
@@ -211,7 +223,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // ─── WebSocket message handler ────────────────────────
 
   useEffect(() => {
-    const unsubMessage = wsService.onMessage((message) => {
+    const unsubMessage = wsService.onMessage((msg: unknown) => {
+      const message = msg as any;
       switch (message.type) {
         case 'INITIAL_STATE':
           dispatch({ type: 'SET_SERVER_STATUS', payload: message.status });

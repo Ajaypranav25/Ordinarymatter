@@ -33,7 +33,11 @@ const notifColors: Record<string, string> = {
   info: colors.info,
 };
 
-export function NotificationsScreen({ navigation }: any) {
+interface NavigationProp {
+  navigate: (screen: string, params?: unknown) => void;
+}
+
+export function NotificationsScreen({ navigation }: { navigation: NavigationProp }) {
   const { state, dispatch } = useStore();
 
   const handleMarkAllRead = () => {
