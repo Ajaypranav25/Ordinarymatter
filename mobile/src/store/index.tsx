@@ -50,6 +50,18 @@ export interface Notification {
   read: boolean;
 }
 
+type ServerStatus = NonNullable<AppStateType['serverStatus']>;
+
+type WebSocketMessage =
+  | { type: 'INITIAL_STATE'; status: ServerStatus; sessions?: Session[]; notifications?: Notification[] }
+  | { type: 'SESSION_UPDATE'; session: Session }
+  | { type: 'NOTIFICATION'; notification: Notification }
+  | { type: 'PROMPT_STARTED' }
+  | { type: 'PROMPT_TOKEN'; token: string }
+  | { type: 'PROMPT_COMPLETED'; response: string }
+  | { type: 'PROMPT_ERROR'; error: string }
+  | { type: 'UNKNOWN' };
+
 export interface AppStateType {
   // Connection
   isConnected: boolean;
@@ -224,7 +236,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubMessage = wsService.onMessage((msg: unknown) => {
-      const message = msg as any;
+      const message = (msg as WebSocketMessage) || { type: 'UNKNOWN' };
       switch (message.type) {
         case 'INITIAL_STATE':
           dispatch({ type: 'SET_SERVER_STATUS', payload: message.status });

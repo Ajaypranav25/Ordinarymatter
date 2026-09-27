@@ -25,7 +25,7 @@ class AuthManager {
    * Generate a new 6-digit pairing code.
    */
   generatePairingCode() {
-    this.currentPairingCode = Math.floor(100000 + Math.random() * 900000).toString();
+    this.currentPairingCode = crypto.randomInt(100000, 1000000).toString();
     this.pairingCodeExpiresAt = Date.now() + PAIRING_CODE_EXPIRY_MS;
     return this.currentPairingCode;
   }
