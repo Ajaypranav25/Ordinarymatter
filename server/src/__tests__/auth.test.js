@@ -55,4 +55,16 @@ test('auth module tests', async (t) => {
     auth.unpair();
     assert.strictEqual(state.pairedDevice, null);
   });
+
+  await t.test('pair() returns null if pairing code is expired', () => {
+    const state = {};
+    const auth = new AuthManager(state);
+    const code = auth.currentPairingCode;
+
+    // Manually expire the code
+    auth.pairingCodeExpiresAt = Date.now() - 1000;
+
+    const result = auth.pair(code);
+    assert.strictEqual(result, null);
+  });
 });

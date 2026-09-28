@@ -120,9 +120,9 @@ export function RemoteScreen() {
                 'What are you currently working on?',
                 'Run the test suite',
                 'Show me the recent changes',
-              ].map((suggestion, i) => (
+              ].map((suggestion) => (
                 <TouchableOpacity
-                  key={i}
+                  key={suggestion}
                   style={styles.suggestion}
                   onPress={() => setPrompt(suggestion)}
                 >
