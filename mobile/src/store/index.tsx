@@ -62,6 +62,14 @@ type WebSocketMessage =
   | { type: 'PROMPT_ERROR'; error: string }
   | { type: 'UNKNOWN' };
 
+export interface PairedDevice {
+  id: string;
+  name: string;
+  platform: string;
+  pairedAt: string;
+  lastSeen: string;
+}
+
 export interface AppStateType {
   // Connection
   isConnected: boolean;
@@ -91,7 +99,7 @@ export interface AppStateType {
   promptError: string | null;
 
   // Device
-  pairedDevice: unknown;
+  pairedDevice: PairedDevice | null;
 }
 
 const initialState: AppStateType = {
@@ -126,7 +134,7 @@ type Action =
   | { type: 'PROMPT_COMPLETED'; payload: string }
   | { type: 'PROMPT_ERROR'; payload: string }
   | { type: 'PROMPT_RESET' }
-  | { type: 'SET_DEVICE'; payload: unknown }
+  | { type: 'SET_DEVICE'; payload: PairedDevice | null }
   | { type: 'RESET' };
 
 function reducer(state: AppStateType, action: Action): AppStateType {
