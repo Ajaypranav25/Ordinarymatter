@@ -206,8 +206,8 @@ export function SessionDetailScreen({ route }: SessionDetailScreenProps) {
         {/* Event Timeline */}
         <Text style={styles.timelineTitle}>Timeline</Text>
         {detail.events && detail.events.length > 0 ? (
-          detail.events.slice().reverse().map((event, index) => (
-            <EventCard key={event.id || index.toString()} event={event} />
+          detail.events.slice().reverse().map((event) => (
+            <EventCard key={event.id} event={event} />
           ))
         ) : (
           <Text style={styles.emptyText}>No events recorded yet.</Text>
