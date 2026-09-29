@@ -35,4 +35,29 @@ test('Hooks Router API', async (t) => {
       });
     assert.strictEqual(res.status, 400);
   });
+
+  await t.test('POST /api/hook-event returns 500 on internal error', async () => {
+    // Save original method
+    const originalProcessHookEvent = state.processHookEvent;
+
+    try {
+      // Mock to throw an error
+      state.processHookEvent = () => {
+        throw new Error('Simulated internal error');
+      };
+
+      const res = await request(app)
+        .post('/api/hook-event')
+        .send({
+          eventType: 'pre-invocation',
+          conversationId: 'test-error-123'
+        });
+
+      assert.strictEqual(res.status, 500);
+      assert.strictEqual(res.body.error, 'Internal error processing hook event');
+    } finally {
+      // Restore original method safely
+      state.processHookEvent = originalProcessHookEvent;
+    }
+  });
 });

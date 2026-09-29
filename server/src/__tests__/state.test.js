@@ -60,4 +60,21 @@ test('state module tests', async (t) => {
     assert.strictEqual(session.status, SessionStatus.WORKING);
     assert.strictEqual(session.toolCallCount, 1);
   });
+
+  await t.test('getSessionDetail returns null for nonexistent session', () => {
+    const state = new StateManager();
+    const detail = state.getSessionDetail('nonexistent-id');
+    assert.strictEqual(detail, null);
+  });
+
+  await t.test('addTranscriptEntry handles ASK_QUESTION and sets waiting input', () => {
+    const state = new StateManager();
+    state.addTranscriptEntry('test-id', { type: 'ASK_QUESTION', content: 'Do you want to proceed?' });
+    const session = state.getOrCreateSession('test-id');
+
+    assert.strictEqual(session.status, SessionStatus.WAITING_INPUT);
+    assert.strictEqual(state.notifications.length, 1);
+    assert.strictEqual(state.notifications[0].type, 'needs_input');
+    assert.strictEqual(state.notifications[0].data.content, 'Do you want to proceed?');
+  });
 });
