@@ -21,6 +21,8 @@ import { ChatBubble } from '../components/ChatBubble';
 import { ConnectionBar } from '../components/ConnectionBar';
 import { colors, spacing, borderRadius, typography, cardStyle } from '../theme';
 
+let messageCounter = 0;
+
 interface ChatMessage {
   id: string;
   type: 'user' | 'assistant';
@@ -48,7 +50,7 @@ export function RemoteScreen() {
       setMessages((prev) => [
         ...prev,
         {
-          id: `assistant-${Date.now()}`,
+          id: `assistant-${Date.now()}-${messageCounter++}`,
           type: 'assistant',
           content: state.promptResponse || lastResponseRef.current,
           timestamp: new Date().toISOString(),
@@ -64,7 +66,7 @@ export function RemoteScreen() {
       setMessages((prev) => [
         ...prev,
         {
-          id: `error-${Date.now()}`,
+          id: `error-${Date.now()}-${messageCounter++}`,
           type: 'assistant',
           content: `❌ Error: ${state.promptError}`,
           timestamp: new Date().toISOString(),
@@ -77,7 +79,7 @@ export function RemoteScreen() {
     if (!prompt.trim() || !state.isConnected || state.isPromptRunning) return;
 
     const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
+      id: `user-${Date.now()}-${messageCounter++}`,
       type: 'user',
       content: prompt.trim(),
       timestamp: new Date().toISOString(),
