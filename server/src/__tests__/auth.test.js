@@ -67,4 +67,76 @@ test('auth module tests', async (t) => {
     const result = auth.pair(code);
     assert.strictEqual(result, null);
   });
+
+  await t.test('middleware() passes open paths without token', () => {
+    const state = {};
+    const auth = new AuthManager(state);
+    const middleware = auth.middleware();
+
+    let nextCalled = false;
+    const req = { path: '/pair' };
+    const res = {};
+    const next = () => { nextCalled = true; };
+
+    middleware(req, res, next);
+    assert.strictEqual(nextCalled, true);
+  });
+
+  await t.test('middleware() rejects missing token on protected paths', () => {
+    const state = {};
+    const auth = new AuthManager(state);
+    const middleware = auth.middleware();
+
+    const req = { path: '/api/protected', headers: {}, query: {} };
+    let statusCalled = null;
+    let jsonCalled = null;
+    const res = {
+      status: (code) => {
+        statusCalled = code;
+        return {
+          json: (data) => { jsonCalled = data; }
+        };
+      }
+    };
+    const next = () => { assert.fail('next() should not be called'); };
+
+    middleware(req, res, next);
+    assert.strictEqual(statusCalled, 401);
+    assert.strictEqual(jsonCalled.error, 'Unauthorized. Pair your device first.');
+  });
+
+  await t.test('middleware() accepts valid token on protected paths', () => {
+    const state = {};
+    const auth = new AuthManager(state);
+    const code = auth.currentPairingCode;
+    const { token } = auth.pair(code);
+
+    const middleware = auth.middleware();
+    const req = { path: '/api/protected', headers: { authorization: `Bearer ${token}` }, query: {} };
+    const res = {};
+    let nextCalled = false;
+    const next = () => { nextCalled = true; };
+
+    middleware(req, res, next);
+    assert.strictEqual(nextCalled, true);
+    assert.ok(req.device);
+  });
+
+  await t.test('verifyWebSocket() handles missing or invalid token', () => {
+    const state = {};
+    const auth = new AuthManager(state);
+    assert.strictEqual(auth.verifyWebSocket('ws://localhost/'), null);
+    assert.strictEqual(auth.verifyWebSocket('ws://localhost/?token=invalid'), null);
+  });
+
+  await t.test('verifyWebSocket() accepts valid token', () => {
+    const state = {};
+    const auth = new AuthManager(state);
+    const code = auth.currentPairingCode;
+    const { token } = auth.pair(code);
+
+    const decoded = auth.verifyWebSocket(`ws://localhost/?token=${token}`);
+    assert.ok(decoded);
+    assert.ok(decoded.deviceId);
+  });
 });
