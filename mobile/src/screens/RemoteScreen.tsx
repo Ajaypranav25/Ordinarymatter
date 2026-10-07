@@ -50,7 +50,7 @@ export function RemoteScreen() {
       setMessages((prev) => [
         ...prev,
         {
-          id: `assistant-${Date.now()}-${messageCounter++}`,
+          id: `assistant-${messageCounter++}`,
           type: 'assistant',
           content: state.promptResponse || lastResponseRef.current,
           timestamp: new Date().toISOString(),
@@ -66,7 +66,7 @@ export function RemoteScreen() {
       setMessages((prev) => [
         ...prev,
         {
-          id: `error-${Date.now()}-${messageCounter++}`,
+          id: `error-${messageCounter++}`,
           type: 'assistant',
           content: `❌ Error: ${state.promptError}`,
           timestamp: new Date().toISOString(),
@@ -79,7 +79,7 @@ export function RemoteScreen() {
     if (!prompt.trim() || !state.isConnected || state.isPromptRunning) return;
 
     const userMessage: ChatMessage = {
-      id: `user-${Date.now()}-${messageCounter++}`,
+      id: `user-${messageCounter++}`,
       type: 'user',
       content: prompt.trim(),
       timestamp: new Date().toISOString(),
