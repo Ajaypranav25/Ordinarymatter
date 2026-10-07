@@ -44,7 +44,7 @@ class StateManager {
    */
   getOrCreateSession(conversationId) {
     if (!conversationId) {
-      conversationId = `unknown-${Date.now()}`;
+      conversationId = `unknown-${crypto.randomUUID()}`;
     }
 
     if (!this.sessions.has(conversationId)) {
