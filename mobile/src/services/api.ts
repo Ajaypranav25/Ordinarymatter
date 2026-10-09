@@ -140,12 +140,22 @@ class ApiService {
       body: body ? JSON.stringify(body) : undefined,
     });
 
+    const text = await response.text();
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP ${response.status}`);
+      let errorData: Record<string, unknown> = {};
+      try {
+        errorData = text ? JSON.parse(text) : {};
+      } catch (e) {
+        // Ignored
+      }
+      throw new Error((errorData.error as string) || `HTTP ${response.status}`);
     }
 
-    return response.json();
+    try {
+      return text ? JSON.parse(text) : ({} as unknown as T);
+    } catch (e) {
+      return {} as unknown as T;
+    }
   }
 
   // ─── Health ─────────────────────────────────────────────
