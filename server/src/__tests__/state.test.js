@@ -77,4 +77,15 @@ test('state module tests', async (t) => {
     assert.strictEqual(state.notifications[0].type, 'needs_input');
     assert.strictEqual(state.notifications[0].data.content, 'Do you want to proceed?');
   });
+
+  await t.test('addTranscriptEntry handles ASK_PERMISSION and sets waiting input', () => {
+    const state = new StateManager();
+    state.addTranscriptEntry('test-id', { type: 'ASK_PERMISSION', content: 'Allow access to this file?' });
+    const session = state.getOrCreateSession('test-id');
+
+    assert.strictEqual(session.status, SessionStatus.WAITING_INPUT);
+    assert.strictEqual(state.notifications.length, 1);
+    assert.strictEqual(state.notifications[0].type, 'needs_input');
+    assert.strictEqual(state.notifications[0].data.content, 'Allow access to this file?');
+  });
 });

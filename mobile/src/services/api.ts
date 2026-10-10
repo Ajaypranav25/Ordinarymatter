@@ -140,12 +140,23 @@ class ApiService {
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP ${response.status}`);
+    const text = await response.text();
+    let data;
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (e) {
+      if (!response.ok) {
+        data = { error: text || 'Invalid JSON response' };
+      } else {
+        throw new Error('Invalid JSON response');
+      }
     }
 
-    return response.json();
+    if (!response.ok) {
+      throw new Error(data.error || `HTTP ${response.status}`);
+    }
+
+    return data as T;
   }
 
   // ─── Health ─────────────────────────────────────────────
