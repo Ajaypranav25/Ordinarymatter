@@ -154,7 +154,7 @@ class ApiService {
     try {
       return text ? JSON.parse(text) : ({} as unknown as T);
     } catch (e) {
-      return {} as unknown as T;
+      throw new Error("JSON parsing failed for successful response");
     }
   }
 
