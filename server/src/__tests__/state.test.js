@@ -114,16 +114,26 @@ test('state module tests', async (t) => {
   });
 
   await t.test('getAllSessions returns serialized sessions', () => {
-    const state = new StateManager();
-    state.getOrCreateSession('test-id-1');
-    // Simulate a small delay so updated at is strictly later for sort
-    const session2 = state.getOrCreateSession('test-id-2');
-    session2.updatedAt = new Date(Date.now() + 1000).toISOString();
+    const originalDateNow = Date.now;
+    try {
+      // Mock Date.now to return a fixed timestamp
+      const mockNow = 1000000000000;
+      Date.now = () => mockNow;
 
-    const sessions = state.getAllSessions();
-    assert.strictEqual(sessions.length, 2);
-    assert.strictEqual(sessions[0].id, 'test-id-2'); // Sorted by updated at, so 2 should be first
-    assert.strictEqual(sessions[0].events, undefined);
+      const state = new StateManager();
+      const session1 = state.getOrCreateSession('test-id-1');
+      session1.updatedAt = new Date(mockNow).toISOString();
+
+      const session2 = state.getOrCreateSession('test-id-2');
+      session2.updatedAt = new Date(mockNow + 1000).toISOString(); // Explicitly 1 second later
+
+      const sessions = state.getAllSessions();
+      assert.strictEqual(sessions.length, 2);
+      assert.strictEqual(sessions[0].id, 'test-id-2'); // Sorted by updated at, so 2 should be first
+      assert.strictEqual(sessions[0].events, undefined);
+    } finally {
+      Date.now = originalDateNow;
+    }
   });
 
   await t.test('getStatus returns correct status', () => {
