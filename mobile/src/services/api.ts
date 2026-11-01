@@ -151,8 +151,12 @@ class ApiService {
       throw new Error((errorData.error as string) || `HTTP ${response.status}`);
     }
 
+    if (!text) {
+      return {} as unknown as T;
+    }
+
     try {
-      return text ? JSON.parse(text) : ({} as unknown as T);
+      return JSON.parse(text) as T;
     } catch (e) {
       throw new Error("JSON parsing failed for successful response");
     }
