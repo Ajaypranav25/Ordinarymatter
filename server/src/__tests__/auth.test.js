@@ -57,15 +57,21 @@ test('auth module tests', async (t) => {
   });
 
   await t.test('pair() returns null if pairing code is expired', () => {
-    const state = {};
-    const auth = new AuthManager(state);
-    const code = auth.currentPairingCode;
+    const originalDateNow = Date.now;
+    try {
+      const state = {};
+      const auth = new AuthManager(state);
+      const code = auth.currentPairingCode;
 
-    // Manually expire the code
-    auth.pairingCodeExpiresAt = Date.now() - 1000;
+      // Manually expire the code by mocking Date.now to a future time
+      const futureNow = auth.pairingCodeExpiresAt + 1000;
+      Date.now = () => futureNow;
 
-    const result = auth.pair(code);
-    assert.strictEqual(result, null);
+      const result = auth.pair(code);
+      assert.strictEqual(result, null);
+    } finally {
+      Date.now = originalDateNow;
+    }
   });
 
   await t.test('middleware() passes open paths without token', () => {
